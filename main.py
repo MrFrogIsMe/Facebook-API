@@ -6,13 +6,17 @@ if __name__ == '__main__':
     names = {}
     total = 0
 
+    path = './facebook_data/your_facebook_activity/messages/inbox'
+
     # Count the number of messages for each person
-    for (root, dirs, files) in os.walk('./facebook_data/your_facebook_activity/messages/inbox'):
+    for (root, dirs, files) in os.walk(path):
         for file in files:
             if file.endswith('.html'):
                 with open(root + '/' + file, 'r') as f:
                     soup = BeautifulSoup(f, 'html.parser')
                     for item in soup.find_all('div', {'class': '_2ph_ _a6-h _a6-i'}):
+                        # if item.text == '群組相片':
+                        #     break
                         if item.text not in names:
                             names[item.text] = 1
                         else:
@@ -21,6 +25,8 @@ if __name__ == '__main__':
 
     # Sort by value
     names = dict(sorted(names.items(), key=lambda item: item[1]))
+    total -= names.get('彭則則', 0)
+    names.pop('彭則則', None)
         
     # Labeling the names
     def convert_key(key: str):
@@ -36,4 +42,4 @@ if __name__ == '__main__':
     
     # Print the result
     for key, value in names.items():
-        print(f'{convert_key(key):<10}\t:{value:<7}, {"#" * math.ceil(value / total * 100)}')
+        print(f'{convert_key(key):<10}\t:{value / total * 100:>5.2f}% ({value})\t|{"#" * math.ceil(value / total * 100)}')
